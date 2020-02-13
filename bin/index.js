@@ -229,7 +229,8 @@ switch (true) {
     switchKey(name[0]);
     break;
   case name.length > 1:
-    console.log(`Enter sshmulti --help for more command`)
+    console.log(`Enter sshmulti --help for more command`);
+    break;
   default:
     console.log(getCurrent());
     break;
