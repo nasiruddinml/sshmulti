@@ -1,6 +1,6 @@
 {
   "name": "sshmulti",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "SSHmulti is a node version of ruby gem SSHwitch that lets you manage different sets of keys in Unix-like systems.",
   "main": "./bin/index.js",
   "homepage": "https://github.com/nasiruddinml/sshmulti#README.md",
