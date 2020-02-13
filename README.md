@@ -4,13 +4,13 @@ Manage multiple ssh accounts.
 SSHmulti
 ==========
 
-SSHmulti is a node version of ruby gem that lets you manage different sets of keys in Unix-like systems.
+SSHmulti is a node version of ruby gem [SSHwitch](https://github.com/agush22/sshwitch) that lets you manage different sets of keys in Unix-like systems.
 The purpose of this is to enable using diferent sets of keys for services such as Github, Heroku, Bitbucket, or any other that requires SSH auth.
 
 Install
 -------
 
-    npm install sshmulti
+    npm install -g sshmulti
 
 Usage
 -----
