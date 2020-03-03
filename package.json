@@ -1,20 +1,20 @@
 {
   "name": "sshmulti",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "SSHmulti is a node version of ruby gem SSHwitch that lets you manage different sets of keys in Unix-like systems.",
   "main": "./bin/index.js",
   "homepage": "https://github.com/nasiruddinml/sshmulti#README.md",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "ssh",
     "multiple",
-    "ssh",
-    "multiple",
     "git",
-    "git",
-    "ssh-keygen"
+    "ssh-keygen",
+    "multiple ssh",
+    "multiple git account",
+    "switch multiple ssh key"
   ],
   "author": "Nasir Uddin",
   "license": "MIT",
@@ -25,10 +25,18 @@
     "type": "git",
     "url": "https://github.com/nasiruddinml/sshmulti.git"
   },
-  "bugs": {"url" : "https://github.com/nasiruddinml/sshmulti/issues"},
+  "bugs": {
+    "url": "https://github.com/nasiruddinml/sshmulti/issues"
+  },
   "dependencies": {
+    "@chilkat/ck-node11-macosx": "^9.50.82",
+    "keypair": "^1.0.1",
     "meow": "^6.0.0",
-    "rimraf": "^3.0.2",
-    "ssh-keygen": "^0.4.2"
+    "node-forge": "^0.9.1",
+    "rimraf": "^3.0.2"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0",
+    "mock-fs": "^4.10.4"
   }
 }

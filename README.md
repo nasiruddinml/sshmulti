@@ -81,4 +81,3 @@ To Do
 -----
 
 * Tests :(
-* Get rid of ssh-keygen dependency

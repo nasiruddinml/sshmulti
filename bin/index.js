@@ -8,15 +8,13 @@ const {
   existsSync,
   copyFileSync,
   mkdirSync,
-  rmdirSync,
   renameSync,
-  statSync
 } = require('fs');
 const os = require('os');
-const path = require('path');
-const keygen = require('ssh-keygen');
 const meow = require('meow');
 const rmdir = require('rimraf');
+const forge = require('node-forge');
+const keypair = require('keypair');
 
 // Get path for work
 const HOME_PATH = os.homedir() + '/';
@@ -80,18 +78,14 @@ const newKey = name => {
     console.log(`Creating key pair in ${SSH_PATH+name}`);
     try {
       mkdirSync(SSH_PATH + name);
-      keygen({
-          location: `${SSH_PATH+name}/id_rsa`,
-          read: true
-        },
-        function (err, out) {
-          if (err) {
-            rmdirSync(SSH_PATH + name);
-            return console.log('Something went wrong: ' + err);
-          };
-          console.log(`Copy your private key for respective use.`);
-          return console.log(`\n private key: \n\n ${out.key}`);
-        });
+      const pair = keypair();
+      const publicKey = forge.pki.publicKeyFromPem(pair.public);
+      const privateKey = forge.pki.privateKeyFromPem(pair.private)
+      const ssh = forge.ssh.publicKeyToOpenSSH(publicKey);
+      const sshPrivate = forge.ssh.privateKeyToOpenSSH(privateKey);
+      writeFileSync(`${SSH_PATH+name}/id_rsa.pub`, ssh);
+      writeFileSync(`${SSH_PATH+name}/id_rsa`, sshPrivate);
+      return console.log(`\n public key: \n\n ${ssh}\n private key: \n\n ${sshPrivate}`);
     } catch (err) {
       console.log(`Could not create key pair, check if you have permission to write on ${SSH_PATH+name}`);
       return console.log(err);
@@ -235,3 +229,5 @@ switch (true) {
     console.log(getCurrent());
     break;
 }
+
+module.exports = getDirectories;
