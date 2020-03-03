@@ -1,6 +1,6 @@
 {
   "name": "sshmulti",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "SSHmulti is a node version of ruby gem SSHwitch that lets you manage different sets of keys in Unix-like systems.",
   "main": "./bin/index.js",
   "homepage": "https://github.com/nasiruddinml/sshmulti#README.md",
@@ -29,7 +29,6 @@
     "url": "https://github.com/nasiruddinml/sshmulti/issues"
   },
   "dependencies": {
-    "@chilkat/ck-node11-macosx": "^9.50.82",
     "keypair": "^1.0.1",
     "meow": "^6.0.0",
     "node-forge": "^0.9.1",
