@@ -9,6 +9,7 @@ const {
   copyFileSync,
   mkdirSync,
   renameSync,
+  chmodSync
 } = require('fs');
 const os = require('os');
 const meow = require('meow');
@@ -85,13 +86,14 @@ const newKey = name => {
       const sshPrivate = forge.ssh.privateKeyToOpenSSH(privateKey);
       writeFileSync(`${SSH_PATH+name}/id_rsa.pub`, ssh);
       writeFileSync(`${SSH_PATH+name}/id_rsa`, sshPrivate);
+      chmodSync(`${SSH_PATH+name}/id_rsa.pub`, 0o600);
+      chmodSync(`${SSH_PATH+name}/id_rsa`, 0o600);
       return console.log(`\n public key: \n\n ${ssh}\n private key: \n\n ${sshPrivate}`);
     } catch (err) {
       console.log(`Could not create key pair, check if you have permission to write on ${SSH_PATH+name}`);
       return console.log(err);
     }
   }
-  return '';
 };
 
 // backup ssh keys
@@ -110,7 +112,6 @@ const backupKey = name => {
       return console.log(err);
     }
   }
-  return '';
 };
 
 // Rename ssh key
