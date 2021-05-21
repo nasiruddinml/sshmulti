@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 // import necessary files
+import meow from 'meow';
 const {
   writeFileSync,
   readdirSync,
@@ -12,7 +13,6 @@ const {
   chmodSync
 } = require('fs');
 const os = require('os');
-const meow = require('meow');
 const rmdir = require('rimraf');
 const forge = require('node-forge');
 const keypair = require('keypair');
