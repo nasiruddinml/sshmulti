@@ -55,6 +55,8 @@ const switchKey = name => {
         copyFileSync(SSH_PATH + name + "/id_rsa", SSH_PATH + "id_rsa");
         copyFileSync(SSH_PATH + name + "/id_rsa.pub", SSH_PATH + "id_rsa.pub");
         writeFileSync(SWITCH_FILE, name);
+        chmodSync(`${SSH_PATH}/id_rsa.pub`, 0o600);
+        chmodSync(`${SSH_PATH}/id_rsa`, 0o600);
         return console.log(`Changed key pair to: ${name}`);
       } catch (err) {
         console.log(`Could not copy, check if you have permission to write on ${SSH_PATH}`);
