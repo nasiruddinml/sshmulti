@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 // import necessary files
-import meow from 'meow';
-const {
+import {
   writeFileSync,
   readdirSync,
   readFileSync,
@@ -11,11 +10,12 @@ const {
   mkdirSync,
   renameSync,
   chmodSync
-} = require('fs');
-const os = require('os');
-const rmdir = require('rimraf');
-const forge = require('node-forge');
-const keypair = require('keypair');
+} from 'node:fs';
+import os from 'node:os';
+import meow from 'meow';
+import rmdir from 'rimraf';
+import forge from 'node-forge';
+import keypair from 'keypair';
 
 // Get path for work
 const HOME_PATH = os.homedir() + '/';
@@ -155,6 +155,7 @@ Advanced usage: sshmulti [option]
     -l, --list                       Get list of key pairs in ${SSH_PATH}
     -d, --delete DELETE              Delete key pair
 `, {
+  importMeta: import.meta,
   flags: {
     backup: {
       type: 'boolean',
@@ -231,4 +232,4 @@ switch (true) {
     break;
 }
 
-module.exports = getDirectories;
+export default getDirectories;
