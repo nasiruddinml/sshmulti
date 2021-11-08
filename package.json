@@ -1,16 +1,36 @@
 {
   "name": "sshmulti",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "SSHmulti is a node version of ruby gem SSHwitch that lets you manage different sets of keys in Unix-like systems.",
-  "exports": "./bin/index.js",
   "homepage": "https://github.com/nasiruddinml/sshmulti#README.md",
-  "type": "module",
   "engines": {
-		"node": ">=12.17"
-	},
-  "scripts": {
-    "test": "jest"
+    "node": ">=12.17"
   },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "umd:main": "dist/umd/index.js",
+  "types": "dist/types/index.d.js",
+  "scripts": {
+    "postinstall": "husky install",
+    "prepublishOnly": "pinst --disable",
+    "postpublish": "pinst --enable",
+    "build": "npm run build:cjs && npm run build:esm && npm run build:umd && npm run build:types",
+    "build:cjs": "node tools/cleanup cjs && tsc -p config/tsconfig.cjs.json",
+    "build:esm": "node tools/cleanup esm && tsc -p config/tsconfig.esm.json",
+    "build:umd": "node tools/cleanup umd && webpack --config config/webpack.config.js",
+    "build:types": "node tools/cleanup types && tsc -p config/tsconfig.types.json",
+    "clean": "node tools/cleanup",
+    "package": "npm run build && npm pack",
+    "test": "jest --no-cache --runInBand",
+    "test:cov": "jest --coverage --no-cache --runInBand",
+    "addscope": "node tools/packagejson name @nasiruddinml/sshmulti"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "ssh",
     "multiple",
@@ -18,12 +38,18 @@
     "ssh-keygen",
     "multiple ssh",
     "multiple git account",
-    "switch multiple ssh key"
+    "switch multiple ssh key",
+    "cjs",
+    "esm",
+    "umd",
+    "typescript",
+    "npm",
+    "package"
   ],
   "author": "Nasir Uddin",
   "license": "MIT",
   "bin": {
-    "sshmulti": "./bin/index.js"
+    "sshmulti": "./dist/cjs/index.js"
   },
   "repository": {
     "type": "git",
@@ -34,12 +60,32 @@
   },
   "dependencies": {
     "keypair": "^1.0.1",
-    "meow": "^10.0.0",
     "node-forge": "^0.10.0",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
-    "jest": "^25.1.0",
-    "mock-fs": "^4.10.4"
+    "@commitlint/cli": "^14.1.0",
+    "@commitlint/config-conventional": "^14.1.0",
+    "@types/jest": "^27.0.2",
+    "@types/node-forge": "^0.10.9",
+    "@types/rimraf": "^3.0.2",
+    "@types/yargs": "^16.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
+    "@typescript-eslint/parser": "^5.3.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "jest": "^27.3.1",
+    "mock-fs": "^4.10.4",
+    "pinst": "^2.1.6",
+    "prettier": "^2.4.1",
+    "ts-jest": "^27.0.7",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.4.4",
+    "webpack": "^5.62.1",
+    "webpack-cli": "^4.9.1"
   }
 }
