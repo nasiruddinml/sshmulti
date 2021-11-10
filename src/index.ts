@@ -39,7 +39,7 @@ export const getCurrent = (): string => {
     return readFileSync(SWITCH_FILE).toString()
   } catch (e) {
     writeFileSync(SWITCH_FILE, '')
-    return readFileSync(SWITCH_FILE).toString()
+    return readFileSync(SWITCH_FILE)?.toString()
   }
 }
 
