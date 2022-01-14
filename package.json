@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "keypair": "^1.0.1",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.0.0",
     "rimraf": "^3.0.2",
     "yargs": "^16.2.0"
   },
