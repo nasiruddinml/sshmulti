@@ -1,4 +1,6 @@
 # SSHmulti
+[![GitHub license](https://img.shields.io/github/license/nasiruddinml/sshmulti)](https://github.com/nasiruddinml/sshmulti/blob/master/LICENSE) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=nasiruddinml_sshmulti&metric=coverage)](https://sonarcloud.io/summary/new_code?id=nasiruddinml_sshmulti)
+
 Manage multiple ssh accounts.
 
 SSHmulti

@@ -13,7 +13,6 @@ import {
   PathLike,
 } from 'fs'
 import * as os from 'os'
-// import meow from 'meow'
 import * as rmdir from 'rimraf'
 import * as forge from 'node-forge'
 import keypair from 'keypair'
@@ -21,17 +20,18 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 // Get path for work
-const HOME_PATH = `${os.homedir()}/`
-const SSH_PATH = `${HOME_PATH}.ssh/`
-const SWITCH_FILE = `${SSH_PATH}.sshwitch`
+export const HOME_PATH = `${os.homedir()}/`
+export const SSH_PATH = `${HOME_PATH}.ssh/`
+export const SWITCH_FILE = `${SSH_PATH}.sshwitch`
 
 // Get the all directory aka keys
-export const getDirectories = (source: PathLike): string[] =>
-  readdirSync(source, {
+export const getDirectories = (source: PathLike): string[] => {
+  return readdirSync(source, {
     withFileTypes: true,
   })
-    .filter((dirent) => dirent.isDirectory())
-    .map((dirent) => dirent.name)
+    ?.filter((dirent) => dirent.isDirectory())
+    ?.map((dirent) => dirent.name)
+}
 
 // Get current key
 export const getCurrent = (): string => {
@@ -45,25 +45,27 @@ export const getCurrent = (): string => {
 
 // get all ssh keys
 export const getList = (): string[] => {
-  getDirectories(SSH_PATH).map((item) => console.log(item))
+  getDirectories(SSH_PATH)?.map((item) => console.log(item))
   return getDirectories(SSH_PATH)
 }
 
 // Switch ssh key
-// eslint-disable-next-line no-undef
-export const switchKey = (name: string | NodeJS.ArrayBufferView): void => {
+export const switchKey = (keyName: string | NodeJS.ArrayBufferView): void => {
   try {
     if (
-      existsSync(`${SSH_PATH + name}/id_rsa`) &&
-      existsSync(`${SSH_PATH + name}/id_rsa.pub`)
+      existsSync(`${SSH_PATH + keyName}/id_rsa`) &&
+      existsSync(`${SSH_PATH + keyName}/id_rsa.pub`)
     ) {
       try {
-        copyFileSync(`${SSH_PATH + name}/id_rsa`, `${SSH_PATH}id_rsa`)
-        copyFileSync(`${SSH_PATH + name}/id_rsa.pub`, `${SSH_PATH}id_rsa.pub`)
-        writeFileSync(SWITCH_FILE, name)
+        copyFileSync(`${SSH_PATH + keyName}/id_rsa`, `${SSH_PATH}id_rsa`)
+        copyFileSync(
+          `${SSH_PATH + keyName}/id_rsa.pub`,
+          `${SSH_PATH}id_rsa.pub`
+        )
+        writeFileSync(SWITCH_FILE, keyName)
         chmodSync(`${SSH_PATH}/id_rsa.pub`, 0o600)
         chmodSync(`${SSH_PATH}/id_rsa`, 0o600)
-        return console.log(`Changed key pair to: ${name}`)
+        return console.log(`Changed key pair to: ${keyName}`)
       } catch (err) {
         console.log(
           `Could not copy, check if you have permission to write on ${SSH_PATH}`
@@ -71,11 +73,13 @@ export const switchKey = (name: string | NodeJS.ArrayBufferView): void => {
         return console.error(err)
       }
     } else {
-      console.log(`Could not read key pair in ${SSH_PATH + name}`)
-      console.log(`Check if key pair exists in ${SSH_PATH + name}\n\n`)
-      console.log(`If not you can create a new one with: "sshmulti -n ${name}"`)
+      console.log(`Could not read key pair in ${SSH_PATH + keyName}`)
+      console.log(`Check if key pair exists in ${SSH_PATH + keyName}\n\n`)
+      console.log(
+        `If not you can create a new one with: "sshmulti -n ${keyName}"`
+      )
       return console.log(
-        `Or backup the current key pair in ${SSH_PATH} with: "sshmulti -b ${name}"`
+        `Or backup the current key pair in ${SSH_PATH} with: "sshmulti -b ${keyName}"`
       )
     }
   } catch (err) {
@@ -84,29 +88,29 @@ export const switchKey = (name: string | NodeJS.ArrayBufferView): void => {
 }
 
 // Register new ssh key
-export const newKey = (name: string): void => {
+export const newKey = (newName: string): void => {
   if (existsSync(SSH_PATH + name)) {
-    return console.log(`${SSH_PATH + name} already exists, skipping`)
+    return console.log(`${SSH_PATH + newName} already exists, skipping`)
   }
-  console.log(`Creating key pair in ${SSH_PATH + name}`)
+  console.log(`Creating key pair in ${SSH_PATH + newName}`)
   try {
-    mkdirSync(SSH_PATH + name)
+    mkdirSync(SSH_PATH + newName)
     const pair = keypair()
     const publicKey = forge.pki.publicKeyFromPem(pair.public)
     const privateKey = forge.pki.privateKeyFromPem(pair.private)
     const ssh = forge.ssh.publicKeyToOpenSSH(publicKey)
     const sshPrivate = forge.ssh.privateKeyToOpenSSH(privateKey)
-    writeFileSync(`${SSH_PATH + name}/id_rsa.pub`, ssh)
-    writeFileSync(`${SSH_PATH + name}/id_rsa`, sshPrivate)
-    chmodSync(`${SSH_PATH + name}/id_rsa.pub`, 0o600)
-    chmodSync(`${SSH_PATH + name}/id_rsa`, 0o600)
+    writeFileSync(`${SSH_PATH + newName}/id_rsa.pub`, ssh)
+    writeFileSync(`${SSH_PATH + newName}/id_rsa`, sshPrivate)
+    chmodSync(`${SSH_PATH + newName}/id_rsa.pub`, 0o600)
+    chmodSync(`${SSH_PATH + newName}/id_rsa`, 0o600)
     return console.log(
       `\n public key: \n\n ${ssh}\n private key: \n\n ${sshPrivate}`
     )
   } catch (err) {
     console.log(
       `Could not create key pair, check if you have permission to write on ${
-        SSH_PATH + name
+        SSH_PATH + newName
       }`
     )
     return console.log(err)
@@ -114,22 +118,24 @@ export const newKey = (name: string): void => {
 }
 
 // backup ssh keys
-export const backupKey = (name: string) => {
-  if (existsSync(SSH_PATH + name)) {
-    return console.log(`${SSH_PATH + name} already exists, skipping`)
+export const backupKey = (oldName: string) => {
+  if (existsSync(SSH_PATH + oldName)) {
+    return console.log(`${SSH_PATH + oldName} already exists, skipping`)
   }
-  console.log(`Copying current key pair in ${SSH_PATH} to ${SSH_PATH + name}`)
+  console.log(
+    `Copying current key pair in ${SSH_PATH} to ${SSH_PATH + oldName}`
+  )
   try {
-    mkdirSync(SSH_PATH + name)
-    copyFileSync(`${SSH_PATH}id_rsa`, `${SSH_PATH + name}/id_rsa`)
-    copyFileSync(`${SSH_PATH}id_rsa.pub`, `${SSH_PATH + name}/id_rsa.pub`)
+    mkdirSync(SSH_PATH + oldName)
+    copyFileSync(`${SSH_PATH}id_rsa`, `${SSH_PATH + oldName}/id_rsa`)
+    copyFileSync(`${SSH_PATH}id_rsa.pub`, `${SSH_PATH + oldName}/id_rsa.pub`)
     return console.log(
-      `Backup to current key pair in ${SSH_PATH} to ${SSH_PATH + name}`
+      `Backup to current key pair in ${SSH_PATH} to ${SSH_PATH + oldName}`
     )
   } catch (err) {
     console.log(
       `Could not backup key pair, check if you have permission to write on ${
-        SSH_PATH + name
+        SSH_PATH + oldName
       }`
     )
     return console.log(err)
@@ -158,10 +164,10 @@ export const renameKey = (oldName: string, newName: string) => {
 }
 
 // delete ssh key
-export const deleteKey = (name: string): void => {
+export const deleteKey = (deletedName: string): void => {
   try {
-    rmdir.sync(SSH_PATH + name)
-    return console.log(`Deleted ${name} sshkey.`)
+    rmdir.sync(SSH_PATH + deletedName)
+    return console.log(`Deleted ${deletedName} sshkey.`)
   } catch (e) {
     return console.log(e)
   }
@@ -184,7 +190,7 @@ const argv = yargs(hideBin(process.argv))
   )
   .help('help')
   .alias('help', 'h')
-  .version('version', '1.0.1')
+  .version('version', '3.0.1')
   .alias('version', 'V')
   .options({
     backup: { type: 'boolean', alias: ['backup', 'b'], default: false },
@@ -193,7 +199,8 @@ const argv = yargs(hideBin(process.argv))
     list: { type: 'boolean', alias: ['list', 'l'], default: false },
     current: { type: 'boolean', alias: ['current', 'c'], default: false },
     delete: { type: 'boolean', alias: ['delete', 'd'], default: false },
-  }).argv
+  })
+  .parseSync()
 
 // Let the fun began
 const isBackup = argv.backup
@@ -224,7 +231,8 @@ switch (true) {
   case isList:
     getList()
     break
-  case isCurrent || name.length === 0:
+  case isCurrent:
+  case name.length === 0:
     console.log(getCurrent())
     break
   case !isBackup &&
