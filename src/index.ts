@@ -21,17 +21,18 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 // Get path for work
-const HOME_PATH = `${os.homedir()}/`
-const SSH_PATH = `${HOME_PATH}.ssh/`
-const SWITCH_FILE = `${SSH_PATH}.sshwitch`
+export const HOME_PATH = `${os.homedir()}/`
+export const SSH_PATH = `${HOME_PATH}.ssh/`
+export const SWITCH_FILE = `${SSH_PATH}.sshwitch`
 
 // Get the all directory aka keys
-export const getDirectories = (source: PathLike): string[] =>
-  readdirSync(source, {
+export const getDirectories = (source: PathLike): string[] => {
+  return readdirSync(source, {
     withFileTypes: true,
   })
-    .filter((dirent) => dirent.isDirectory())
-    .map((dirent) => dirent.name)
+    ?.filter((dirent) => dirent.isDirectory())
+    ?.map((dirent) => dirent.name)
+}
 
 // Get current key
 export const getCurrent = (): string => {
@@ -45,12 +46,11 @@ export const getCurrent = (): string => {
 
 // get all ssh keys
 export const getList = (): string[] => {
-  getDirectories(SSH_PATH).map((item) => console.log(item))
+  getDirectories(SSH_PATH)?.map((item) => console.log(item))
   return getDirectories(SSH_PATH)
 }
 
 // Switch ssh key
-// eslint-disable-next-line no-undef
 export const switchKey = (name: string | NodeJS.ArrayBufferView): void => {
   try {
     if (
@@ -184,7 +184,7 @@ const argv = yargs(hideBin(process.argv))
   )
   .help('help')
   .alias('help', 'h')
-  .version('version', '1.0.1')
+  .version('version', '3.0.1')
   .alias('version', 'V')
   .options({
     backup: { type: 'boolean', alias: ['backup', 'b'], default: false },
@@ -193,7 +193,8 @@ const argv = yargs(hideBin(process.argv))
     list: { type: 'boolean', alias: ['list', 'l'], default: false },
     current: { type: 'boolean', alias: ['current', 'c'], default: false },
     delete: { type: 'boolean', alias: ['delete', 'd'], default: false },
-  }).argv
+  })
+  .parseSync()
 
 // Let the fun began
 const isBackup = argv.backup
