@@ -18,6 +18,10 @@ describe('current sshkey is set and viewed', () => {
 
 
   test('it should be return empty if no sshkey name', async () => {
+    // Let's mock readFileSync function
+    fs.readFileSync.mockImplementationOnce(() => {throw 'Error' })
+    // Let's mock writeFileSync function
+    fs.writeFileSync.mockReturnValue('');
     // Let's call our function
     const result = getCurrent();
 

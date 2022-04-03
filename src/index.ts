@@ -202,7 +202,7 @@ export const parsedArg = yargs(hideBin(process.argv))
   )
   .help('help')
   .alias('help', 'h')
-  .version('version', process.env.npm_package_version || '3.0.2')
+  .version('version', '3.0.3')
   .alias('version', 'V')
   .options({
     backup: { type: 'boolean', alias: ['backup', 'b'], default: false },
