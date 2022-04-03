@@ -19,9 +19,12 @@ describe('current sshkey is set and viewed', () => {
 
   test('it should be return empty if no sshkey name', async () => {
     // Let's call our function
-    getCurrent();
+    const result = getCurrent();
+
     // check if the writeFileSync function was called due to the empty sshkey name
     expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
+    // check our result is that empty string
+    expect(result).toBe('');
   })
 
   test('it should be return current sshkey name', async () => {
