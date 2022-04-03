@@ -1,22 +1,7 @@
 import * as cliModule from '../src/index'
 import { handleCommand } from '../src/index'
-
-const mockArgv = {
-  _: [],
-  c: false,
-  current: false,
-  backup: false,
-  b: false,
-  new: false,
-  n: false,
-  rename: false,
-  r: false,
-  list: false,
-  l: false,
-  delete: false,
-  d: false,
-  '$0': '../src/index'
-}
+const fs = require('fs');
+jest.mock('fs');
 
 describe('Checking handleCommand functions', () => {
   // Get ready before original test
@@ -66,8 +51,20 @@ describe('Checking handleCommand functions', () => {
     // Let's spy on console.log function
     const consoleSpy = jest.spyOn(console, 'log')
 
+    // Let's mock existsSync function
+    fs.existsSync.mockReturnValue(true);
+
+    // Let's mock copyFileSync function
+    fs.copyFileSync.mockReturnValue(true);
+
+    // Let's mock writeFileSync function
+    fs.writeFileSync.mockReturnValue(true);
+
+    // Let's mock chmodSync function
+    fs.chmodSync.mockReturnValue(true);
+
     // Let's set mock data to be used in our implementation
-    const mockGetCurrent = jest.spyOn(cliModule, 'getCurrent').mockReturnValue('current')
+    const mockGetCurrent = jest.spyOn(cliModule, 'getCurrent').mockImplementation(() => 'current')
 
     mockArgv._ = []
     // Let's call our function
@@ -82,10 +79,23 @@ describe('Checking handleCommand functions', () => {
     // Let's spy on console.log function
     const consoleSpy = jest.spyOn(console, 'log')
 
+    // Let's mock existsSync function
+    fs.existsSync.mockReturnValue(true);
+
+    // Let's mock copyFileSync function
+    fs.copyFileSync.mockReturnValue(true);
+
+    // Let's mock writeFileSync function
+    fs.writeFileSync.mockReturnValue(true);
+
+    // Let's mock chmodSync function
+    fs.chmodSync.mockReturnValue(true);
+
     // Let's set mock data to be used in our implementation
-    const mockGetCurrent = jest.spyOn(cliModule, 'getCurrent').mockReturnValue('current')
+    const mockGetCurrent = jest.spyOn(cliModule, 'getCurrent').mockImplementation(() => 'current')
 
     mockArgv.current = true
+    mockArgv._ = []
     // Let's call our function
     handleCommand(mockArgv)
 
