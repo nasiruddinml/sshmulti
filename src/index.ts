@@ -24,6 +24,10 @@ export const HOME_PATH = `${os.homedir()}/`
 export const SSH_PATH = `${HOME_PATH}.ssh/`
 export const SWITCH_FILE = `${SSH_PATH}.sshwitch`
 
+// get buffer to string
+export const bufferToString = (buffer: string | Buffer | undefined = '') =>
+  buffer.toString()
+
 // Get the all directory aka keys
 export const getDirectories = (source: PathLike): string[] => {
   return readdirSync(source, {
@@ -39,7 +43,7 @@ export const getCurrent = (): string => {
     return readFileSync(SWITCH_FILE).toString()
   } catch (e) {
     writeFileSync(SWITCH_FILE, '')
-    return readFileSync(SWITCH_FILE)?.toString()
+    return bufferToString(readFileSync(SWITCH_FILE))
   }
 }
 
@@ -89,7 +93,7 @@ export const switchKey = (keyName: string | NodeJS.ArrayBufferView): void => {
 
 // Register new ssh key
 export const newKey = (newName: string): void => {
-  if (existsSync(SSH_PATH + name)) {
+  if (existsSync(SSH_PATH + newName)) {
     return console.log(`${SSH_PATH + newName} already exists, skipping`)
   }
   console.log(`Creating key pair in ${SSH_PATH + newName}`)
@@ -104,6 +108,9 @@ export const newKey = (newName: string): void => {
     writeFileSync(`${SSH_PATH + newName}/id_rsa`, sshPrivate)
     chmodSync(`${SSH_PATH + newName}/id_rsa.pub`, 0o600)
     chmodSync(`${SSH_PATH + newName}/id_rsa`, 0o600)
+    copyFileSync(`${SSH_PATH + newName}/id_rsa`, `${SSH_PATH}id_rsa`)
+    copyFileSync(`${SSH_PATH + newName}/id_rsa.pub`, `${SSH_PATH}id_rsa.pub`)
+    writeFileSync(SWITCH_FILE, newName)
     return console.log(
       `\n public key: \n\n ${ssh}\n private key: \n\n ${sshPrivate}`
     )
@@ -156,15 +163,20 @@ export const renameKey = (oldName: string, newName: string) => {
       writeFileSync(SWITCH_FILE, newName)
       switchKey(newName)
     }
-    return console.log('Renamed the current key')
+    return console.log(`Renamed ${oldName} key to ${newName}`)
   } catch (err) {
-    console.log('Could not rename')
+    console.log('Could not rename key pair')
     return console.log(err)
   }
 }
 
 // delete ssh key
 export const deleteKey = (deletedName: string): void => {
+  if (!existsSync(SSH_PATH + deletedName)) {
+    return console.log(
+      `${SSH_PATH + deletedName} doesn't exists, cannot delete`
+    )
+  }
   try {
     rmdir.sync(SSH_PATH + deletedName)
     return console.log(`Deleted ${deletedName} sshkey.`)
@@ -174,7 +186,7 @@ export const deleteKey = (deletedName: string): void => {
 }
 // Using argv for taking flag and input
 
-const argv = yargs(hideBin(process.argv))
+export const parsedArg = yargs(hideBin(process.argv))
   .usage(
     `
     Switch and manage key pairs in ${SSH_PATH}
@@ -190,7 +202,7 @@ const argv = yargs(hideBin(process.argv))
   )
   .help('help')
   .alias('help', 'h')
-  .version('version', '3.0.1')
+  .version('version', process.env.npm_package_version || '3.0.2')
   .alias('version', 'V')
   .options({
     backup: { type: 'boolean', alias: ['backup', 'b'], default: false },
@@ -199,57 +211,71 @@ const argv = yargs(hideBin(process.argv))
     list: { type: 'boolean', alias: ['list', 'l'], default: false },
     current: { type: 'boolean', alias: ['current', 'c'], default: false },
     delete: { type: 'boolean', alias: ['delete', 'd'], default: false },
-  })
-  .parseSync()
+  }).argv
 
-// Let the fun began
-const isBackup = argv.backup
-const isCurrent = argv.current
-const isDelete = argv.delete
-const isList = argv.list
-const isRename = argv.rename
-const isNew = argv.new
-const name = argv._ || ''
-switch (true) {
-  case isBackup && name[0].toString()?.length === 1:
-    backupKey(name[0].toString())
-    break
-  case isRename && name.length === 2:
-    // eslint-disable-next-line no-case-declarations
-    if (name[0] && name[1]) {
-      renameKey(name[0].toString(), name[1].toString())
-    } else {
-      console.log('Please enter valid name. Type sshmulti --help for more.')
-    }
-    break
-  case isNew && name.length === 1:
-    newKey(name[0].toString())
-    break
-  case isDelete && name.length === 1:
-    deleteKey(name[0].toString())
-    break
-  case isList:
-    getList()
-    break
-  case isCurrent:
-  case name.length === 0:
-    console.log(getCurrent())
-    break
-  case !isBackup &&
+export const handleCommand = (argv: {
+  [x: string]: unknown
+  backup: boolean
+  new: boolean
+  rename: boolean
+  list: boolean
+  current: boolean
+  delete: boolean
+  _: (string | number)[]
+  $0: string
+}) => {
+  const {
+    backup: isBackup,
+    current: isCurrent,
+    delete: isDelete,
+    list: isList,
+    rename: isRename,
+    new: isNew,
+    _: name,
+  } = argv
+
+  if (isBackup && name[0].toString().length >= 1) {
+    return backupKey(name[0].toString())
+  }
+  if (isRename && name.length === 2) {
+    return renameKey(name[0].toString(), name[1].toString())
+  }
+
+  if (isNew && name.length === 1) {
+    return newKey(name[0].toString())
+  }
+
+  if (isDelete && name.length === 1) {
+    return deleteKey(name[0].toString())
+  }
+
+  if (isList) {
+    return getList()
+  }
+
+  if (isCurrent || name.length === 0) {
+    return console.log(getCurrent())
+  }
+
+  if (
+    !isBackup &&
     !isCurrent &&
     !isDelete &&
     !isList &&
     !isRename &&
     !isNew &&
-    name.length === 1:
-    switchKey(name[0].toString())
-    break
-  case name.length > 1:
-    console.log('Enter sshmulti --help for more command')
-    break
-  default:
-    console.log(getCurrent())
-    break
+    name.length === 1
+  ) {
+    return switchKey(name[0].toString())
+  }
+
+  return console.log('Please enter valid name. Type sshmulti --help for more.')
 }
+
+// Let the fun began
+;(async () => {
+  const argv = await parsedArg
+  handleCommand(argv)
+})()
 
 export default getDirectories
